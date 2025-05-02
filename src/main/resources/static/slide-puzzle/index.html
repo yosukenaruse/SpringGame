@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5×5 スライドパズル</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 500px;
+        }
+        .puzzle {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            gap: 4px;
+            width: 300px;
+            height: 300px;
+            background-color: #333;
+            border: 4px solid #333;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        .tile {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #4a90e2;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .tile:hover {
+            background-color: #357bd8;
+        }
+        .empty {
+            background-color: #333;
+            cursor: default;
+        }
+        .empty:hover {
+            background-color: #333;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #357bd8;
+        }
+        .moves {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+        .solved {
+            animation: celebrate 1s ease-in-out infinite;
+        }
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>5×5 スライドパズル</h1>
+        <div class="puzzle" id="puzzle"></div>
+        <div class="moves">移動回数: <span id="moveCount">0</span></div>
+        <div class="controls">
+            <button id="newGame">新しいゲーム</button>
+            <button id="solve">解く</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const puzzle = document.getElementById('puzzle');
+            const moveCountDisplay = document.getElementById('moveCount');
+            const newGameButton = document.getElementById('newGame');
+            const solveButton = document.getElementById('solve');
+            
+            const SIZE = 5;
+            const TOTAL_TILES = SIZE * SIZE;
+            let board = []; // 論理的なボードの状態を保持する配列
+            let emptyPosition = TOTAL_TILES - 1;
+            let moveCount = 0;
+            let isSolved = false;
+            
+            // パズルを初期化
+            function initializePuzzle() {
+                puzzle.innerHTML = '';
+                board = [];
+                moveCount = 0;
+                moveCountDisplay.textContent = moveCount;
+                puzzle.classList.remove('solved');
+                isSolved = false;
+                
+                // 論理的なボードを初期化
+                for (let i = 0; i < TOTAL_TILES; i++) {
+                    board.push(i < TOTAL_TILES - 1 ? i + 1 : 0); // 0は空きマスを表す
+                }
+                
+                emptyPosition = TOTAL_TILES - 1;
+                renderBoard();
+            }
+            
+            // ボードを描画
+            function renderBoard() {
+                puzzle.innerHTML = '';
+                
+                for (let i = 0; i < TOTAL_TILES; i++) {
+                    const tile = document.createElement('div');
+                    tile.classList.add('tile');
+                    
+                    if (board[i] === 0) {
+                        tile.classList.add('empty');
+                        tile.textContent = '';
+                    } else {
+                        tile.textContent = board[i];
+                        tile.setAttribute('data-position', i);
+                        tile.addEventListener('click', () => handleTileClick(i));
+                    }
+                    
+                    puzzle.appendChild(tile);
+                }
+            }
+            
+            // タイルクリック処理
+            function handleTileClick(position) {
+                if (isSolved) return;
+                
+                if (canMove(position)) {
+                    moveTile(position);
+                    renderBoard();
+                    checkWin();
+                }
+            }
+            
+            // 指定位置のタイルが移動可能か判定
+            function canMove(position) {
+                // 空きマスに隣接しているか確認
+                const row = Math.floor(position / SIZE);
+                const col = position % SIZE;
+                const emptyRow = Math.floor(emptyPosition / SIZE);
+                const emptyCol = emptyPosition % SIZE;
+                
+                // 同じ行で隣接している、または同じ列で隣接している
+                return (row === emptyRow && Math.abs(col - emptyCol) === 1) || 
+                       (col === emptyCol && Math.abs(row - emptyRow) === 1);
+            }
+            
+            // タイルを移動
+            function moveTile(position) {
+                // 論理的なボード上でタイルを移動
+                const temp = board[position];
+                board[position] = board[emptyPosition];
+                board[emptyPosition] = temp;
+                
+                // 空きマスの位置を更新
+                emptyPosition = position;
+                
+                // 移動回数をカウント
+                moveCount++;
+                moveCountDisplay.textContent = moveCount;
+            }
+            
+            // 有効な移動先を取得
+            function getValidMoves() {
+                const row = Math.floor(emptyPosition / SIZE);
+                const col = emptyPosition % SIZE;
+                const validMoves = [];
+                
+                // 上
+                if (row > 0) validMoves.push(emptyPosition - SIZE);
+                // 下
+                if (row < SIZE - 1) validMoves.push(emptyPosition + SIZE);
+                // 左
+                if (col > 0) validMoves.push(emptyPosition - 1);
+                // 右
+                if (col < SIZE - 1) validMoves.push(emptyPosition + 1);
+                
+                return validMoves;
+            }
+            
+            // パズルをシャッフル
+            function shufflePuzzle() {
+                // 十分なランダム性を確保するために多めの移動回数でシャッフル
+                for (let i = 0; i < 500; i++) {
+                    const possibleMoves = getValidMoves();
+                    if (possibleMoves.length > 0) {
+                        const randomMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+                        const temp = board[randomMove];
+                        board[randomMove] = board[emptyPosition];
+                        board[emptyPosition] = temp;
+                        emptyPosition = randomMove;
+                    }
+                }
+                
+                moveCount = 0;
+                moveCountDisplay.textContent = moveCount;
+                renderBoard();
+            }
+            
+            // 勝利判定
+            function checkWin() {
+                // 全てのタイルが正しい位置にあるか確認
+                for (let i = 0; i < TOTAL_TILES - 1; i++) {
+                    if (board[i] !== i + 1) {
+                        return false;
+                    }
+                }
+                
+                // 空きマスが右下にあるか確認
+                if (board[TOTAL_TILES - 1] === 0) {
+                    isSolved = true;
+                    puzzle.classList.add('solved');
+                    setTimeout(() => {
+                        alert(`おめでとうございます！${moveCount}手でクリアしました！`);
+                    }, 300);
+                    return true;
+                }
+                
+                return false;
+            }
+            
+            // パズルを解く
+            function solvePuzzle() {
+                // 解いた状態にする
+                for (let i = 0; i < TOTAL_TILES - 1; i++) {
+                    board[i] = i + 1;
+                }
+                board[TOTAL_TILES - 1] = 0;
+                emptyPosition = TOTAL_TILES - 1;
+                
+                moveCount = 0;
+                moveCountDisplay.textContent = moveCount;
+                isSolved = true;
+                renderBoard();
+                puzzle.classList.add('solved');
+            }
+            
+            // イベントリスナーを設定
+            newGameButton.addEventListener('click', () => {
+                initializePuzzle();
+                shufflePuzzle();
+            });
+            
+            solveButton.addEventListener('click', solvePuzzle);
+            
+            // 初期化とシャッフル
+            initializePuzzle();
+            shufflePuzzle();
+        });
+    </script>
+</body>
+</html>
