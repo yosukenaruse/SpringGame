@@ -3,232 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>卵キャッチゲーム</title>
-    <style>
-        body {
-            margin: 0;
-            background-color: #87CEEB;
-            font-family: Arial, sans-serif;
-            color: #333;
-            text-align: center;
-            overflow: hidden;
-        }
-        #game {
-            position: relative;
-            width: 400px;
-            height: 500px;
-            margin: 20px auto;
-            border: 1px solid #333;
-            background-color: #E0F7FF;
-        }
-        #egg {
-            position: absolute;
-            width: 30px;
-            height: 40px;
-            background-color: #FFF;
-            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        #brokenEgg {
-            display: none;
-            position: absolute;
-            width: 60px;
-            height: 15px;
-            background-color: #FFEA8A;
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        #eggWhite {
-            display: none;
-            position: absolute;
-            width: 80px;
-            height: 20px;
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 50%;
-            z-index: 1;
-        }
-        #plate {
-            position: absolute;
-            bottom: 0;
-            width: 100px;
-            height: 20px;
-            background-color: #FF6347;
-            border-radius: 50% 50% 5% 5% / 20% 20% 5% 5%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        #plateInner {
-            position: absolute;
-            bottom: 5px;
-            left: 10px;
-            width: 80px;
-            height: 10px;
-            background-color: #FF8066;
-            border-radius: 50% 50% 5% 5% / 20% 20% 5% 5%;
-        }
-        #score {
-            font-size: 20px;
-            margin-top: 10px;
-            color: #333;
-        }
-        button {
-            padding: 10px 20px;
-            margin-top: 10px;
-            font-size: 18px;
-            background-color: #FF6347;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        button:hover {
-            background-color: #E55336;
-        }
-        h1 {
-            color: #333;
-            text-shadow: 1px 1px 2px #FFF;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>卵キャッチゲーム</h1>
-    <div id="game">
-        <div id="egg"></div>
-        <div id="eggWhite"></div>
-        <div id="brokenEgg"></div>
-        <div id="plate">
-            <div id="plateInner"></div>
+    <div id="app">
+        <h1>{{ title }}</h1>
+        <div id="game" 
+             @mousemove="movePlate" 
+             @touchmove.prevent="movePlateTouch"
+             ref="game">
+            <div id="egg" :style="eggStyle"></div>
+            <div id="eggWhite" :style="eggWhiteStyle"></div>
+            <div id="brokenEgg" :style="brokenEggStyle"></div>
+            <div id="plate" :style="plateStyle">
+                <div id="plateInner"></div>
+            </div>
         </div>
+        <div id="score">スコア: {{ score }}</div>
+        <button @click="startGame">{{ startBtnText }}</button>
     </div>
-    <div id="score">スコア: 0</div>
-    <button id="startBtn">スタート</button>
-
-    <script>
-        const game = document.getElementById('game');
-        const egg = document.getElementById('egg');
-        const brokenEgg = document.getElementById('brokenEgg');
-        const eggWhite = document.getElementById('eggWhite');
-        const plate = document.getElementById('plate');
-        const scoreDisplay = document.getElementById('score');
-        const startBtn = document.getElementById('startBtn');
-        
-        let score = 0;
-        let gameRunning = false;
-        let eggSpeed = 2;
-        let platePos = 175;
-        
-        // 初期配置
-        function resetGame() {
-            egg.style.left = Math.random() * (game.offsetWidth - 30) + 'px';
-            egg.style.top = '0px';
-            egg.style.display = 'block';
-            brokenEgg.style.display = 'none';
-            eggWhite.style.display = 'none';
-            plate.style.left = (platePos - plate.offsetWidth/2) + 'px';
-            score = 0;
-            scoreDisplay.textContent = 'スコア: ' + score;
-        }
-        
-        // ゲームループ
-        function gameLoop() {
-            if (!gameRunning) return;
-            
-            // 卵を落下させる
-            let top = parseInt(egg.style.top) || 0;
-            top += eggSpeed;
-            egg.style.top = top + 'px';
-            
-            // お皿の位置を更新
-            plate.style.left = (platePos - plate.offsetWidth/2) + 'px';
-            
-            // 衝突判定
-            const eggLeft = parseInt(egg.style.left);
-            const eggRight = eggLeft + egg.offsetWidth;
-            const eggBottom = top + egg.offsetHeight;
-            const plateLeft = parseInt(plate.style.left);
-            const plateRight = plateLeft + plate.offsetWidth;
-            const plateTop = game.offsetHeight - plate.offsetHeight;
-            
-            // 卵が地面に着いたか
-            if (eggBottom >= plateTop) {
-                // お皿の上に卵が落ちたかチェック
-                if (eggRight > plateLeft && eggLeft < plateRight) {
-                    // 成功！
-                    score++;
-                    scoreDisplay.textContent = 'スコア: ' + score;
-                    eggSpeed += 0.2; // 難易度アップ
-                    
-                    // 新しい卵をスタート
-                    egg.style.left = Math.random() * (game.offsetWidth - 30) + 'px';
-                    egg.style.top = '0px';
-                } else {
-                    // 失敗 - 卵が割れる
-                    gameRunning = false;
-                    egg.style.display = 'none';
-                    
-                    // 卵の白身が広がる
-                    eggWhite.style.display = 'block';
-                    eggWhite.style.left = (eggLeft - 25) + 'px';
-                    eggWhite.style.top = (game.offsetHeight - eggWhite.offsetHeight) + 'px';
-                    
-                    // 割れた卵黄を表示
-                    brokenEgg.style.display = 'block';
-                    brokenEgg.style.left = (eggLeft - 15) + 'px';
-                    brokenEgg.style.top = (game.offsetHeight - brokenEgg.offsetHeight - 3) + 'px';
-                    
-                    // ランダムな「べちゃ」効果（白身のサイズや位置をランダムに）
-                    const randomSize = 70 + Math.random() * 30;
-                    eggWhite.style.width = randomSize + 'px';
-                    const randomOffset = Math.random() * 20 - 10;
-                    eggWhite.style.left = (eggLeft - 25 + randomOffset) + 'px';
-                    
-                    // 0.7秒後にゲームオーバーメッセージ
-                    setTimeout(() => {
-                        alert('ゲームオーバー！最終スコア: ' + score);
-                        startBtn.textContent = 'リスタート';
-                    }, 700);
-                }
-            }
-            
-            requestAnimationFrame(gameLoop);
-        }
-        
-        // マウスでお皿を動かす
-        game.addEventListener('mousemove', function(e) {
-            if (!gameRunning) return;
-            const rect = game.getBoundingClientRect();
-            platePos = e.clientX - rect.left;
-            
-            // お皿が画面外に出ないように
-            const minPos = plate.offsetWidth/2;
-            const maxPos = game.offsetWidth - plate.offsetWidth/2;
-            
-            if (platePos < minPos) platePos = minPos;
-            if (platePos > maxPos) platePos = maxPos;
-        });
-        
-        // タッチでも操作できるように
-        game.addEventListener('touchmove', function(e) {
-            if (!gameRunning) return;
-            e.preventDefault();
-            const rect = game.getBoundingClientRect();
-            platePos = e.touches[0].clientX - rect.left;
-            
-            const minPos = plate.offsetWidth/2;
-            const maxPos = game.offsetWidth - plate.offsetWidth/2;
-            
-            if (platePos < minPos) platePos = minPos;
-            if (platePos > maxPos) platePos = maxPos;
-        });
-        
-        // スタートボタン
-        startBtn.addEventListener('click', function() {
-            resetGame();
-            gameRunning = true;
-            gameLoop();
-            this.blur();
-        });
-        
-        // 初期化
-        resetGame();
-    </script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

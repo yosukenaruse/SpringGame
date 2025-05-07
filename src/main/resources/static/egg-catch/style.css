@@ -1,0 +1,92 @@
+body {
+    margin: 0;
+    background-color: #87CEEB;
+    font-family: Arial, sans-serif;
+    color: #333;
+    text-align: center;
+    overflow: hidden;
+}
+
+#game {
+    position: relative;
+    width: 400px;
+    height: 500px;
+    margin: 20px auto;
+    border: 1px solid #333;
+    background-color: #E0F7FF;
+}
+
+#egg {
+    position: absolute;
+    width: 30px;
+    height: 40px;
+    background-color: #FFF;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#brokenEgg {
+    display: none;
+    position: absolute;
+    width: 60px;
+    height: 15px;
+    background-color: #FFEA8A;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#eggWhite {
+    display: none;
+    position: absolute;
+    width: 80px;
+    height: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    z-index: 1;
+}
+
+#plate {
+    position: absolute;
+    bottom: 0;
+    width: 100px;
+    height: 20px;
+    background-color: #FF6347;
+    border-radius: 50% 50% 5% 5% / 20% 20% 5% 5%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#plateInner {
+    position: absolute;
+    bottom: 5px;
+    left: 10px;
+    width: 80px;
+    height: 10px;
+    background-color: #FF8066;
+    border-radius: 50% 50% 5% 5% / 20% 20% 5% 5%;
+}
+
+#score {
+    font-size: 20px;
+    margin-top: 10px;
+    color: #333;
+}
+
+button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    font-size: 18px;
+    background-color: #FF6347;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #E55336;
+}
+
+h1 {
+    color: #333;
+    text-shadow: 1px 1px 2px #FFF;
+} 
