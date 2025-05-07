@@ -102,6 +102,14 @@ createApp({
                     setTimeout(() => {
                         alert('ゲームオーバー！最終スコア: ' + this.score);
                         this.startBtnText = 'リスタート';
+
+                        // スコアを保存
+                        fetch('/api/game/score?userId=1&score=' + this.score, {
+                            method: 'POST'
+                        })
+                            .then(response => response.text())
+                            .then(result => console.log(result))
+                            .catch(error => console.error('Error:', error));
                     }, 700);
                 }
             }
