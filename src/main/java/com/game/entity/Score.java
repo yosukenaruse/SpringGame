@@ -5,37 +5,25 @@ import java.time.LocalDateTime;
 public class Score {
     private Integer userId;
     private Integer score;
+    private String gameType;  // 追加
     private LocalDateTime createdAt;
 
     public Score() {
     }
 
-    public Score(Integer userId, Integer score) {
+    public Score(Integer userId, Integer score, String gameType) {  // コンストラクタ修正
         this.userId = userId;
         this.score = score;
+        this.gameType = gameType;
     }
 
-    public Integer getUserId() {
-        return userId;
+    // getter/setter追加
+    public String getGameType() {
+        return gameType;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setGameType(String gameType) {
+        this.gameType = gameType;
     }
-
-    public Integer getScore() {
-        return score;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-} 
+    // 既存のgetter/setter
+}

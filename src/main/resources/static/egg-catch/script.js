@@ -104,12 +104,30 @@ createApp({
                         this.startBtnText = 'リスタート';
 
                         // スコアを保存
-                        fetch('/api/game/score?userId=1&score=' + this.score, {
-                            method: 'POST'
+                        fetch('/api/game/score', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                userId: 1,
+                                score: this.score,
+                                gameType: 'egg-catch'
+                            })
                         })
-                            .then(response => response.text())
-                            .then(result => console.log(result))
-                            .catch(error => console.error('Error:', error));
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                }
+                                return response.text();
+                            })
+                            .then(result => {
+                                console.log('Success:', result);
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('スコアの保存に失敗しました: ' + error.message);
+                            });
                     }, 700);
                 }
             }
