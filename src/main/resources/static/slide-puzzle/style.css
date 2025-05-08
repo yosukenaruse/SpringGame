@@ -1,0 +1,78 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #ffffff;
+}
+
+.container {
+    text-align: center;
+}
+
+h1 {
+    color: #000000;
+    margin-bottom: 20px;
+}
+
+.puzzle {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    width: 300px;
+    height: 300px;
+    background-color: #000000;
+    padding: 2px;
+    border-radius: 4px;
+}
+
+.tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    color: #000000;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.tile:hover {
+    background-color: #ffeb3b;
+}
+
+.empty {
+    background-color: #000000;
+    cursor: default;
+}
+
+.controls {
+    margin-top: 20px;
+}
+
+button {
+    padding: 8px 16px;
+    margin: 0 5px;
+    background-color: #000000;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #ffeb3b;
+    color: #000000;
+}
+
+.moves {
+    margin: 15px 0;
+    font-size: 16px;
+    color: #000000;
+}
+
+/* アニメーション関連のクラスを削除 */ 
