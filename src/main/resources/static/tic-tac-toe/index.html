@@ -3,63 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <title>シンプルな○×ゲーム</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        .container {
-            text-align: center;
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-        .board {
-            display: grid;
-            grid-template-columns: repeat(3, 100px);
-            grid-template-rows: repeat(3, 100px);
-            gap: 5px;
-            margin: 0 auto;
-        }
-        .cell {
-            width: 100px;
-            height: 100px;
-            background-color: white;
-            border: 2px solid #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 48px;
-            cursor: pointer;
-        }
-        .x {
-            color: red;
-        }
-        .o {
-            color: blue;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
 <body>
-    <div class="container">
+    <div id="app" class="container">
         <h1>○×ゲーム</h1>
         <div class="board">
-            <div class="cell x">✕</div>
-            <div class="cell o">○</div>
-            <div class="cell x">✕</div>
-            <div class="cell"></div>
-            <div class="cell x">✕</div>
-            <div class="cell"></div>
-            <div class="cell o">○</div>
-            <div class="cell"></div>
-            <div class="cell o">○</div>
+            <div v-for="(cell, index) in board" 
+                 :key="index" 
+                 class="cell" 
+                 :class="{ 'x': cell === 'X', 'o': cell === 'O' }"
+                 @click="makeMove(index)">
+                {{ cell }}
+            </div>
         </div>
+        <div class="status">{{ status }}</div>
+        <button class="reset-button" @click="resetGame">ゲームをリセット</button>
     </div>
+    <script src="app.js"></script>
 </body>
 </html>
